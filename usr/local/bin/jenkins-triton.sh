@@ -97,7 +97,7 @@ MAX_JVM_HEAP_KB=$(echo "8k $TOTAL_MEMORY_KB $RESERVED_KB - pq" | dc)
 
 # If we are running on Triton, then we will tune the JVM for the platform
 if [ -d /native ]; then
-    HW_THREADS=$(/usr/local/bin/proclimit)
+    HW_THREADS=$(/usr/local/bin/proclimit.sh)
 
     # We allocate +1 extra thread in order to utilize bursting better
     if [ $HW_THREADS -le 8 ]; then
