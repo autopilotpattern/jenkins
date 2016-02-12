@@ -119,5 +119,6 @@ export _JAVA_OPTIONS="${JAVA_GC_FLAGS} -Xmx${MAX_JVM_HEAP_KB}K -Djava.net.prefer
 exec authbind --deep /usr/local/bin/jenkins.sh \
     --httpsCertificate=${CERT_PATH}/cert.pem \
     --httpsPrivateKey=${CERT_PATH}/key.pem \
+    --httpPort=80 \
     --httpsPort=443 \
     "$@"
