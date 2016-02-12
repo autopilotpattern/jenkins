@@ -1,0 +1,5 @@
+credentials
+ssh-credentials
+token-macro:1.7
+ssh-slaves:1.6
+durable-task:1.3
