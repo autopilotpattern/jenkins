@@ -1,7 +1,11 @@
 {
   "consul": "consul:8500",
-  "onStart": "/usr/local/bin/triton-jenkins.sh",
   "stopTimeout": 60,
+  "logging": {
+    "level": "INFO",
+    "format": "go",
+    "output": "stdout"
+  },
   "services": [
     {
       "name": "jenkins",

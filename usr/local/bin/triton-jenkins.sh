@@ -1,8 +1,15 @@
 #!/usr/bin/env bash
 
 if [ ! -f "${JENKINS_HOME}/first-started.txt" ]; then
-    echo "You must complete the Jenkins setup script before running the main process"
-    exit 1
+    echo 'Waiting for initial configuration to complete'
+fi
+
+while [ ! -f "${JENKINS_HOME}/first-started.txt" ]; do
+    sleep 1
+done
+
+if [ -f "${JENKINS_HOME}/first-started.txt" ]; then
+    echo 'Found configuration. Starting Jenkins.'
 fi
 
 # If we are running on Triton, then we will tune the JVM for the platform

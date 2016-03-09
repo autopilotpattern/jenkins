@@ -9,17 +9,17 @@ consul:
     image: misterbisson/triton-consul:latest
     restart: always
     mem_limit: 128m
-    ports:
-        - 53
-        - 8300
-        - 8301
-        - 8302
-        - 8400
-        - 8500
+    expose:
+      - 53
+      - 8300
+      - 8301
+      - 8302
+      - 8400
+      - 8500
     dns:
        - 127.0.0.1
     environment:
-        - BOOTSTRAP_HOST
+       - BOOTSTRAP_HOST
     command: >
       /opt/containerbuddy/containerbuddy
       -config file:///etc/containerbuddy.json
@@ -39,3 +39,7 @@ jenkins:
     restart: always
     labels:
         - triton.cns.services=jenkins
+#    command: >
+#      /opt/containerbuddy/containerbuddy
+#      -config file:///opt/containerbuddy/app.json
+#      /usr/local/bin/triton-jenkins.sh

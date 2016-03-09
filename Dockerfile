@@ -1,9 +1,12 @@
-FROM jenkins:1.642.1
+FROM jenkins:1.642.2
 
 MAINTAINER Elijah Zupancic <elijah@zupancic.name>
 
-ENV CONTAINERBUDDY_VER 1.1.0
-ENV CONTAINERBUDDY_CHECKSUM 5cb5212707b5a7ffe41ee916add83a554d1dddfa
+#ENV CONTAINERBUDDY_VER 1.1.0
+#ENV CONTAINERBUDDY_CHECKSUM 5cb5212707b5a7ffe41ee916add83a554d1dddfa
+
+ENV CONTAINERBUDDY_VER 1.0.0
+ENV CONTAINERBUDDY_CHECKSUM acaab447e4492aa12d4f7daf908fbd10707bd844
 
 # Add dependencies for patched Docker Jenkins plugin
 COPY usr/share/jenkins/docker-plugin-deps.txt /usr/share/jenkins/docker-plugin-deps.txt
@@ -41,6 +44,7 @@ RUN apt-get update && \
         xmlstarlet \
         dc \
         uuid-runtime \
+        strace vim \
         docker-engine && \
     rm -rf /var/lib/apt/lists/* && \
     touch /etc/authbind/byport/22 && \
@@ -67,4 +71,5 @@ USER jenkins
 EXPOSE 22
 EXPOSE 80
 
-ENTRYPOINT ["/opt/containerbuddy/containerbuddy", "-config", "/opt/containerbuddy/app.json"]
+ENTRYPOINT []
+CMD ["/opt/containerbuddy/containerbuddy", "-config", "file:///opt/containerbuddy/app.json", "/usr/local/bin/triton-jenkins.sh"]
