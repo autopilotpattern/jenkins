@@ -1,21 +1,5 @@
 #!/usr/bin/env bash
 
-CERT_PATH=${JENKINS_HOME}/certs
-
-if [ ! -d ${CERT_PATH} ]; then
-    echo "No TLS/SSL certs stored on server. Generating self-signed certs."
-    mkdir -p ${CERT_PATH}
-
-    TEMP_CERT_PATH=$(/usr/local/bin/generate-cert.sh)
-
-    cp ${TEMP_CERT_PATH}/cert.pem ${CERT_PATH}
-    cp ${TEMP_CERT_PATH}/key.pem ${CERT_PATH}
-
-    chmod -R o-rwx ${CERT_PATH}
-
-    rm -rf ${TEMP_CERT_PATH}
-fi
-
 if [ ! -f "${JENKINS_HOME}/first-started.txt" ]; then
     FIRST_BOOT=1
     date > ${JENKINS_HOME}/first-started.txt
@@ -89,36 +73,3 @@ if [ ${FIRST_BOOT} -eq 1 ]; then
         exit 0
     fi
 fi
-
-# We detect the amount of memory available on the machine and allocate 512mb as a buffer
-TOTAL_MEMORY_KB=$(cat /proc/meminfo | grep MemTotal | cut -d: -f2 | sed 's/^ *//' | cut -d' ' -f1)
-RESERVED_KB=512000
-MAX_JVM_HEAP_KB=$(echo "8k $TOTAL_MEMORY_KB $RESERVED_KB - pq" | dc)
-
-# If we are running on Triton, then we will tune the JVM for the platform
-if [ -d /native ]; then
-    HW_THREADS=$(/usr/local/bin/proclimit.sh)
-
-    # We allocate +1 extra thread in order to utilize bursting better
-    if [ $HW_THREADS -le 8 ]; then
-        GC_THREADS=$(echo "8k $HW_THREADS 1 + pq" | dc)
-    else
-        # ParallelGCThreads = (ncpus <= 8) ? ncpus : 3 + ((ncpus * 5) / 8)
-        ADJUSTED=$(echo "8k $HW_THREADS 5 * pq" | dc)
-        DIVIDED=$(echo "8k $ADJUSTED 8 / pq" | dc)
-        GC_THREADS=$(echo "8k $DIVIDED 3 + pq" | dc | awk 'function ceil(valor) { return (valor == int(valor) && value != 0) ? valor : int(valor)+1 } { printf "%d", ceil($1) }')
-    fi
-
-    JAVA_GC_FLAGS="-XX:-UseGCTaskAffinity -XX:-BindGCTaskThreadsToCPUs -XX:ParallelGCThreads=${GC_THREADS}"
-else
-    JAVA_GC_FLAGS=""
-fi
-
-export _JAVA_OPTIONS="${JAVA_GC_FLAGS} -Xmx${MAX_JVM_HEAP_KB}K -Djava.net.preferIPv4Stack=true -Djava.awt.headless=true -Dhudson.DNSMultiCast.disabled=true"
-
-exec authbind --deep /usr/local/bin/jenkins.sh \
-    --httpsCertificate=${CERT_PATH}/cert.pem \
-    --httpsPrivateKey=${CERT_PATH}/key.pem \
-    --httpPort=80 \
-    --httpsPort=443 \
-    "$@"

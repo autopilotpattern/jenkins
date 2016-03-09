@@ -1,0 +1,30 @@
+{
+  "consul": "consul:8500",
+  "onStart": "/usr/local/bin/triton-jenkins.sh",
+  "stopTimeout": 60,
+  "services": [
+    {
+      "name": "jenkins",
+      "port": 80,
+      "health": [
+        "/usr/bin/curl",
+        "--fail",
+        "-s",
+        "http://localhost/"
+      ],
+      "interfaces": [
+        "eth1[1]",
+        "eth0",
+        "192.168.0.0/16",
+        "2001:db8::/64",
+        "eth2:inet",
+        "eth2:inet6",
+        "inet",
+        "inet6"
+      ],
+      "poll": 30,
+      "ttl": 60,
+      "tags": [ "jenkins" ]
+    }
+  ]
+}
