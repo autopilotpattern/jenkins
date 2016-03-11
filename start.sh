@@ -49,7 +49,7 @@ while [ $ISRESPONSIVE != 1 ]; do
     fi
 done
 echo
-echo 'The bootstrap instance is now running'
+echo 'The consul bootstrap instance is now running'
 echo "Dashboard: $BOOTSTRAP_UI:8500/ui/"
 command -v open >/dev/null 2>&1 && `open http://$BOOTSTRAP_UI:8500/ui/`
 
