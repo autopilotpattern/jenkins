@@ -19,9 +19,9 @@ if [ ${FIRST_BOOT} -eq 1 ]; then
     API_TOKEN=$(dd if=/dev/urandom bs=64 count=1 2> /dev/null | base64 | tr -d "\n")
     HASH=$(echo -n "$DEFAULT_PASSWD"'{zil0}' | sha256sum | cut -d' ' -f1)
 
-    echo "A default Jenkins user has been created with the credentials:"
-    echo "login: admin password: $DEFAULT_PASSWD"
-    echo "Once you login, be sure to change the credentials to your needs."
+    echo -e "\e[1mA default Jenkins user has been created with the credentials:"
+    echo -e "login: \e[32madmin\e[0m\e[1mA password: \e[1mA\e[32m$DEFAULT_PASSWD"
+    echo -e "\e[0m\e[1mAOnce you login, be sure to change the credentials to your needs.\e[0m"
 
     xmlstarlet ed \
         -u '//passwordHash' -v "zil0:${HASH}" \
@@ -35,9 +35,9 @@ if [ ${FIRST_BOOT} -eq 1 ]; then
     echo "Setting up Triton credentials"
     ssh-keygen -q -t rsa -N "" -b 2048 -f ~/.ssh/id_rsa
 
-    echo "Add the following public key to your Triton account:"
+    echo -e "\e[0m\e[1mAAdd the following public key to your Triton account:"
     cat ~/.ssh/id_rsa.pub
-    echo
+    echo -e "\e[0m"
     echo "You can do this in the Joyent portal by clicking on your name on the"
     echo "top right and choosing account or you can do this using the CLI with"
     echo "the smartdc tools by using the sdc-user command:"

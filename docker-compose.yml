@@ -9,7 +9,7 @@ consul:
     image: misterbisson/triton-consul:latest
     restart: always
     mem_limit: 128m
-    expose:
+    ports:
       - 53
       - 8300
       - 8301
@@ -29,17 +29,18 @@ consul:
                   -bootstrap-expect 3
 
 jenkins:
-    image: dekobon/triton-jenkins
+    image: dekobon/triton-jenkins:cb-integration
+    restart: always
+    mem_limit: 8g
     links:
       - consul
-    mem_limit: 8g
     ports:
       - 80
       - 22
-    restart: always
     labels:
-        - triton.cns.services=jenkins
-#    command: >
-#      /opt/containerbuddy/containerbuddy
-#      -config file:///opt/containerbuddy/app.json
-#      /usr/local/bin/triton-jenkins.sh
+      - triton.cns.services=jenkins
+    entrypoint: []
+    command: >
+      /opt/containerbuddy/containerbuddy
+      -config file:///opt/containerbuddy/app.json
+      /usr/local/bin/triton-jenkins.sh
