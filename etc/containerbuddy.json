@@ -1,5 +1,5 @@
 {
-  "consul": "consul:8500",
+  "consul": "{{ .CONSUL }}:8500",
   "stopTimeout": 60,
   "logging": {
     "level": "INFO",

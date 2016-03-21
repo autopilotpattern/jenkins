@@ -98,3 +98,5 @@ tramp
 # server auth directory
 /server/
 
+# Jenkins docker-compose environment
+_env

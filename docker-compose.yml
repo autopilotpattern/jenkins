@@ -7,6 +7,7 @@ jenkins:
       - 22
     labels:
       - triton.cns.services=jenkins
+    env_file: _env
     entrypoint: []
     command: >
       /bin/containerbuddy
