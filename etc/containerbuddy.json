@@ -3,7 +3,7 @@
   "stopTimeout": 60,
   "logging": {
     "level": "INFO",
-    "format": "go",
+    "format": "default",
     "output": "stdout"
   },
   "services": [
