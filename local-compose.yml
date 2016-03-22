@@ -7,7 +7,7 @@ jenkins:
     environment:
       - CONSUL=consul
     links:
-    - consul:consul
+      - consul:consul
 
 consul:
     extends:

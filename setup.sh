@@ -31,6 +31,7 @@ TRITON_ACCOUNT=
 
 # Check for correct configuration
 check() {
+
     command -v docker >/dev/null 2>&1 || {
         echo
         tput rev  # reverse
@@ -96,7 +97,16 @@ check() {
         exit 1
     fi
 
+    # setup environment file
     echo CONSUL=consul.svc.${TRITON_ACCOUNT}.${TRITON_DC}.triton.zone > _env
+    echo SDC_URL=${SDC_URL} >> _env
+    echo SDC_ACCOUNT=${SDC_ACCOUNT} >> _env
+
+    echo DOCKER_TLS_VERIFY=1 >> _env
+    echo DOCKER_CERT_PATH=/var/jenkins_home/.sdc/docker/${SDC_ACCOUNT} >> _env
+    echo DOCKER_HOST=${DOCKER_HOST} >> _env
+
+    echo PRIVATE_KEY=$(cat ${DOCKER_CERT_PATH}/key.pem | tr '\n' '#') >> _env
 }
 
 # ---------------------------------------------------

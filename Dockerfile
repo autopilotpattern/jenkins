@@ -40,6 +40,11 @@ RUN apt-get update && \
     chown jenkins /etc/authbind/byport/80 && \
     chown jenkins /etc/authbind/byport/443
 
+# Add SDC setup script
+RUN curl --retry 6 -sSL -o /usr/local/bin/sdc-docker-setup.sh \
+https://raw.githubusercontent.com/joyent/sdc-docker/master/tools/sdc-docker-setup.sh \
+   && chmod +x /usr/local/bin/sdc-docker-setup.sh
+
 # Add Containerbuddy and its configuration
 ENV CONTAINERBUDDY_VER 1.2.1
 ENV CONTAINERBUDDY_CHECKSUM aca04b3c6d6ed66294241211237012a23f8b4f20
