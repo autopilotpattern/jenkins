@@ -32,7 +32,7 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>cp -R ${WORKSPACE}/jobs ${JENKINS_HOME}</command>
+      <command>/usr/local/bin/reload-jobs.sh</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>

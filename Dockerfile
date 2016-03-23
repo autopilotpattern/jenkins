@@ -68,6 +68,7 @@ RUN curl --retry 6 -sSL -f https://github.com/dekobon/docker-plugin/releases/dow
 COPY usr/local/bin/first-run.sh /usr/local/bin/first-run.sh
 COPY usr/local/bin/jenkins.sh /usr/local/bin/jenkins.sh
 COPY usr/local/bin/proclimit.sh /usr/local/bin/proclimit.sh
+COPY usr/local/bin/reload-jobs.sh /usr/local/bin/reload-jobs.sh
 COPY usr/share/jenkins/templates /usr/share/jenkins/templates
 
 EXPOSE 22
