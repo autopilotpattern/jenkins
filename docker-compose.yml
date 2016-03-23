@@ -3,16 +3,12 @@ jenkins:
     restart: always
     mem_limit: 8g
     ports:
-      - 80
+      - 8080
       - 22
     labels:
       - triton.cns.services=jenkins
     env_file: _env
     entrypoint: []
-    command: >
-      /bin/containerbuddy
-      /usr/local/bin/triton-jenkins.sh
-
 
 # Start with a single host which will bootstrap the cluster.
 # In production we'll want to use an HA cluster.
@@ -31,8 +27,4 @@ consul:
        - 127.0.0.1
     labels:
       - triton.cns.services=consul
-    command: >
-      /bin/consul agent -server
-                  -config-dir=/config
-                  -ui-dir /ui
-                  -bootstrap-expect 1
+    command: -server -bootstrap -ui-dir /ui

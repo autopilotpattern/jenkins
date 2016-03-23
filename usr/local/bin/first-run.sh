@@ -1,17 +1,12 @@
 #!/usr/bin/env bash
 
+set -e
+
+# this setup shouldn't run again if we're just restarting the container
 if [ -f "${JENKINS_HOME}/first-started.txt" ]; then
     exit 0
 fi
-
 date > ${JENKINS_HOME}/first-started.txt
-create_jenkins_user
-docker_setup
-docker_plugin_setup
-setup_jenkins_home
-
-# verify we're good-to-go
-docker info
 
 # We setup a default user account so that there are no race conditions when
 # creating your first Jenkins server on the cloud
@@ -22,18 +17,18 @@ create_jenkins_user() {
     cp -r /usr/share/jenkins/templates/config.xml ${JENKINS_HOME}
     mkdir -p ${JENKINS_HOME}/users/admin
 
-    DEFAULT_PASSWD=$(dd if=/dev/urandom bs=9 count=1 2> /dev/null | base64 | tr -d "\n")
-    API_TOKEN=$(dd if=/dev/urandom bs=64 count=1 2> /dev/null | base64 | tr -d "\n")
-    HASH=$(echo -n "$DEFAULT_PASSWD"'{zil0}' | sha256sum | cut -d' ' -f1)
+    JENKINS_PASSWD=${JENKINS_PASSWD:-$(dd if=/dev/urandom bs=9 count=1 2> /dev/null | base64 | tr -d "\n")}
+    JENKINS_API_TOKEN=${JENKINS_API_TOKEN:-$(dd if=/dev/urandom bs=64 count=1 2> /dev/null | base64 | tr -d "\n")}
+    HASH=$(echo -n "$JENKINS_PASSWD"'{zil0}' | sha256sum | cut -d' ' -f1)
 
     echo -e "A default Jenkins user has been created with the credentials:"
-    echo -e "login: \e[1madmin\e[0m password: \e[1m$DEFAULT_PASSWD"
+    echo -e "login: \e[1madmin\e[0m password: \e[1m$JENKINS_PASSWD"
     echo -e "\e[0mOnce you login, be sure to change the credentials to your needs."
 
     xmlstarlet \
         ed \
         -u '//passwordHash' -v "zil0:${HASH}" \
-        -u '//apiToken' -v "${API_TOKEN}" \
+        -u '//apiToken' -v "${JENKINS_API_TOKEN}" \
         /usr/share/jenkins/templates/users/admin/config.xml \
         > ${JENKINS_HOME}/users/admin/config.xml
 
@@ -48,33 +43,41 @@ create_jenkins_user() {
 docker_setup() {
     echo
     echo 'Setting up Triton credentials for launching Docker containers...'
+    if [ -z ${PRIVATE_KEY} ]; then
+        echo 'PRIVATE_KEY not set. Exiting.'
+        exit 1
+    fi
 
     mkdir -p /var/jenkins_home/.ssh
-    echo ${PRIVATE_KEY} | sed 's/#/\n/g' > /var/jenkins_home/.ssh/id_rsa
-    chmod 400 /var/jenkins_home/.ssh/id_rsa
-    ssh-keygen -y -f /var/jenkins_home/.ssh/id_rsa -N '' \
-               > /var/jenkins_home/.ssh/id_rsa.pub
+    echo ${PRIVATE_KEY} | sed 's/#/\n/g' > /var/jenkins_home/.ssh/triton
+    chmod 400 /var/jenkins_home/.ssh/triton
+    ssh-keygen -y -f /var/jenkins_home/.ssh/triton -N '' \
+               > /var/jenkins_home/.ssh/triton.pub
 
     echo 'Running Triton setup script using your credentials...'
-    bash /tmp/sdc-docker-setup.sh ${SDC_URL} ${SDC_ACCOUNT} ~/.ssh/id_rsa
+    bash /usr/local/bin/sdc-docker-setup.sh ${SDC_URL} ${SDC_ACCOUNT} ~/.ssh/triton
 }
 
 # adds the Triton Docker credentials to the Jenkins Docker plugin
 docker_plugin_setup() {
     echo
     echo "Adding Triton Docker credentials to Jenkins..."
-
-    DOCKER_CREDENTIALS_ID="$(uuidgen -r)"
+    if [ -z ${TRITON_ACCOUNT} ]; then
+        echo 'TRITON_ACCOUNT not set. Exiting.'
+        exit 1
+    fi
 
     xmlstarlet \
         ed \
-        -u '//com.nirima.jenkins.plugins.docker.utils.DockerDirectoryCredentials/id' -v ${DOCKER_CREDENTIALS_ID} \
+        -u '//com.nirima.jenkins.plugins.docker.utils.DockerDirectoryCredentials/id' \
+        -v ${TRITON_ACCOUNT} \
         /usr/share/jenkins/templates/credentials.xml \
         > ${JENKINS_HOME}/credentials.xml
 
     xmlstarlet \
         ed \
-        -u '//com.nirima.jenkins.plugins.docker.DockerCloud/credentialsId' -v ${DOCKER_CREDENTIALS_ID} \
+        -u '//com.nirima.jenkins.plugins.docker.DockerCloud/credentialsId' \
+        -v ${TRITON_ACCOUNT} \
         /usr/share/jenkins/templates/config.xml \
         > ${JENKINS_HOME}/config.xml
 }
@@ -109,3 +112,11 @@ copy_reference_file() {
         [[ ${rel} == plugins/*.jpi ]] && touch "/var/jenkins_home/${rel}.pinned"
     fi;
 }
+
+create_jenkins_user
+docker_setup
+docker_plugin_setup
+setup_jenkins_home
+
+# verify we're good-to-go
+docker info

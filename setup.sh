@@ -101,6 +101,7 @@ check() {
     echo CONSUL=consul.svc.${TRITON_ACCOUNT}.${TRITON_DC}.triton.zone > _env
     echo SDC_URL=${SDC_URL} >> _env
     echo SDC_ACCOUNT=${SDC_ACCOUNT} >> _env
+    echo TRITON_ACCOUNT=${TRITON_ACCOUNT} >> _env
 
     echo DOCKER_TLS_VERIFY=1 >> _env
     echo DOCKER_CERT_PATH=/var/jenkins_home/.sdc/docker/${SDC_ACCOUNT} >> _env

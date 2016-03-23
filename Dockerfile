@@ -1,14 +1,5 @@
 FROM jenkins:1.642.2
 
-# Add dependencies for patched Docker Jenkins plugin
-COPY usr/share/jenkins/docker-plugin-deps.txt /usr/share/jenkins/docker-plugin-deps.txt
-RUN /usr/local/bin/plugins.sh /usr/share/jenkins/docker-plugin-deps.txt
-
-# Add patched Docker Jenkins plugin
-RUN curl --retry 6 -sSL -f https://github.com/dekobon/docker-plugin/releases/download/sdc-patch/docker-plugin.hpi -o /usr/share/jenkins/ref/plugins/docker-plugin.jpi && \
-    unzip -qt /usr/share/jenkins/ref/plugins/docker-plugin.jpi && \
-    chown -R jenkins:jenkins /usr/share/jenkins/ref/plugins
-
 USER root
 
 # Add authbind so that we can listen on lower ports
@@ -27,7 +18,6 @@ RUN apt-get update && \
         xmlstarlet \
         dc \
         uuid-runtime \
-        strace vim \
         docker-engine && \
     rm -rf /var/lib/apt/lists/* && \
     touch /etc/authbind/byport/22 && \
@@ -59,16 +49,29 @@ RUN export CB_SHA1=aca04b3c6d6ed66294241211237012a23f8b4f20 \
 
 COPY etc/containerbuddy.json etc/containerbuddy.json
 
-# Jenkins config and templates
-COPY usr/local/bin/first-run.sh /usr/local/bin/first-run.sh
-COPY usr/local/bin/triton-jenkins.sh /usr/local/bin/triton-jenkins.sh
-COPY usr/local/bin/proclimit.sh /usr/local/bin/proclimit.sh
-COPY usr/share/jenkins/templates /usr/share/jenkins/templates
+
+# ------------------------------------------------
+# install Jenkins plugins and configuration
 
 USER jenkins
+
+# Add Jenkins plugins
+COPY usr/share/jenkins/plugin-deps.txt /usr/share/jenkins/plugin-deps.txt
+RUN /usr/local/bin/plugins.sh /usr/share/jenkins/plugin-deps.txt
+
+# Add patched Docker Jenkins plugin
+RUN curl --retry 6 -sSL -f https://github.com/dekobon/docker-plugin/releases/download/sdc-patch/docker-plugin.hpi -o /usr/share/jenkins/ref/plugins/docker-plugin.jpi && \
+    unzip -qt /usr/share/jenkins/ref/plugins/docker-plugin.jpi && \
+    chown -R jenkins:jenkins /usr/share/jenkins/ref/plugins
+
+# Jenkins config and templates
+COPY usr/local/bin/first-run.sh /usr/local/bin/first-run.sh
+COPY usr/local/bin/jenkins.sh /usr/local/bin/jenkins.sh
+COPY usr/local/bin/proclimit.sh /usr/local/bin/proclimit.sh
+COPY usr/share/jenkins/templates /usr/share/jenkins/templates
 
 EXPOSE 22
 EXPOSE 80
 
 ENTRYPOINT []
-CMD ["/bin/containerbuddy", "/usr/local/bin/triton-jenkins.sh"]
+CMD ["/bin/containerbuddy", "/usr/local/bin/jenkins.sh"]

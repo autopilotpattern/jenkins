@@ -1,17 +1,5 @@
 #!/usr/bin/env bash
 
-if [ ! -f "${JENKINS_HOME}/first-started.txt" ]; then
-    echo 'Waiting for initial configuration to complete'
-fi
-
-while [ ! -f "${JENKINS_HOME}/first-started.txt" ]; do
-    sleep 1
-done
-
-if [ -f "${JENKINS_HOME}/first-started.txt" ]; then
-    echo 'Found configuration. Starting Jenkins.'
-fi
-
 # If we are running on Triton, then we will tune the JVM for the platform
 if [ -d /native ]; then
     HW_THREADS=$(/usr/local/bin/proclimit.sh)
@@ -39,9 +27,8 @@ else
     MEMORY_SETTINGS=""
 fi
 
-export _JAVA_OPTIONS="${JAVA_GC_FLAGS} ${MEMORY_SETTINGS} -Djava.net.preferIPv4Stack=true -Djava.awt.headless=true -Dhudson.DNSMultiCast.disabled=true"
+JAVA_OPTS="${JAVA_GC_FLAGS} ${MEMORY_SETTINGS} -Djava.net.preferIPv4Stack=true -Djava.awt.headless=true -Dhudson.DNSMultiCast.disabled=true"
 
-exec authbind --deep /usr/local/bin/jenkins.sh \
-    --httpPort=80 \
-    "$@"
-
+authbind --deep java $JAVA_OPTS \
+         -jar /usr/share/jenkins/jenkins.war \
+         --httpPort=80 $JENKINS_OPTS
