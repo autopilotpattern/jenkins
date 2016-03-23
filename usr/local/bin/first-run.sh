@@ -113,10 +113,23 @@ copy_reference_file() {
     fi;
 }
 
+get_jobs() {
+    mkdir -p ${JENKINS_HOME}/jobs/jenkins-jobs
+    xmlstarlet \
+        ed \
+        -u '//project/scm/userRemoteConfigs/hudson.plugins.git.UserRemoteConfig/url' \
+        -v ${GITHUB_JOBS_REPO} \
+        -u '//project/scm/branches/hudson.plugins.git.BranchSpec/name' \
+        -v ${GITHUB_JOBS_SPEC:-'*/master'} \
+        /usr/share/jenkins/templates/jenkins-jobs.config.xml \
+        > ${JENKINS_HOME}/jobs/jenkins-jobs/config.xml
+}
+
 create_jenkins_user
 docker_setup
 docker_plugin_setup
 setup_jenkins_home
+get_jobs
 
 # verify we're good-to-go
 docker info

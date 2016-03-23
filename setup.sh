@@ -98,16 +98,28 @@ check() {
     fi
 
     # setup environment file
-    echo CONSUL=consul.svc.${TRITON_ACCOUNT}.${TRITON_DC}.triton.zone > _env
+    echo 'JENKINS_PASSWD=' > _env
+    echo 'GITHUB_API_KEY=' >> _env
+    echo 'GITHUB_JOBS_REPO=' >> _env
+    echo 'GITHUB_JOBS_SPEC=' >> _env
+    echo >> _env
+
+    echo CONSUL=consul.svc.${TRITON_ACCOUNT}.${TRITON_DC}.triton.zone >> _env
+    echo >> _env
+
+    # variables we need for pointing Docker to Triton
     echo SDC_URL=${SDC_URL} >> _env
     echo SDC_ACCOUNT=${SDC_ACCOUNT} >> _env
     echo TRITON_ACCOUNT=${TRITON_ACCOUNT} >> _env
-
     echo DOCKER_TLS_VERIFY=1 >> _env
     echo DOCKER_CERT_PATH=/var/jenkins_home/.sdc/docker/${SDC_ACCOUNT} >> _env
     echo DOCKER_HOST=${DOCKER_HOST} >> _env
+    echo >> _env
 
+    # munge the private key so that we can pass it into an env var sanely
+    # and then unmunge it in our startup script
     echo PRIVATE_KEY=$(cat ${DOCKER_CERT_PATH}/key.pem | tr '\n' '#') >> _env
+    echo 'Edit the _env file to include a JENKINS_PASSWD and GITHUB_* config'
 }
 
 # ---------------------------------------------------
