@@ -1,5 +1,5 @@
 jenkins:
-    image: dekobon/triton-jenkins:cb-integration
+    image: 0x74696d/triton-jenkins:cb-integration
     restart: always
     mem_limit: 8g
     ports:
