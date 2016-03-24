@@ -3,12 +3,11 @@ jenkins:
     restart: always
     mem_limit: 8g
     ports:
-      - 8080
+      - 80
       - 22
     labels:
       - triton.cns.services=jenkins
     env_file: _env
-    entrypoint: []
 
 # Start with a single host which will bootstrap the cluster.
 # In production we'll want to use an HA cluster.

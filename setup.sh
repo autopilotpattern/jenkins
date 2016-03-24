@@ -104,7 +104,7 @@ check() {
     echo 'GITHUB_JOBS_SPEC=' >> _env
     echo >> _env
 
-    echo CONSUL=consul.svc.${TRITON_ACCOUNT}.${TRITON_DC}.triton.zone >> _env
+    echo CONSUL=consul.svc.${TRITON_ACCOUNT}.${TRITON_DC}.cns.joyent.com >> _env
     echo >> _env
 
     # variables we need for pointing Docker to Triton
