@@ -11,14 +11,7 @@
     {
       "name": "jenkins",
       "port": 80,
-      "health": [
-        "/usr/bin/curl",
-        "--fail",
-        "-s",
-        "-o",
-        "/dev/null",
-        "http://localhost/"
-      ],
+      "health": "/usr/local/bin/reload-jobs.sh check",
       "interfaces": [
         "eth0",
         "eth1[1]",
