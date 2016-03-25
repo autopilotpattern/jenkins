@@ -1,0 +1,20 @@
+jenkins:
+    extends:
+      file: docker-compose.yml
+      service: jenkins
+    build: .
+    mem_limit: 1g
+    environment:
+      - CONSUL=consul
+    links:
+      - consul:consul
+    ports:
+      - "8080:80"
+      - "2222:22"
+
+consul:
+    extends:
+      file: docker-compose.yml
+      service: consul
+    ports:
+      - "8500:8500"

@@ -1,32 +1,6 @@
 FROM jenkins:1.642.2
 
-MAINTAINER Elijah Zupancic <elijah@zupancic.name>
-
-#ENV CONTAINERBUDDY_VER 1.1.0
-#ENV CONTAINERBUDDY_CHECKSUM 5cb5212707b5a7ffe41ee916add83a554d1dddfa
-
-ENV CONTAINERBUDDY_VER 1.0.0
-ENV CONTAINERBUDDY_CHECKSUM acaab447e4492aa12d4f7daf908fbd10707bd844
-
-# Add dependencies for patched Docker Jenkins plugin
-COPY usr/share/jenkins/docker-plugin-deps.txt /usr/share/jenkins/docker-plugin-deps.txt
-RUN /usr/local/bin/plugins.sh /usr/share/jenkins/docker-plugin-deps.txt
-
-# Add patched Docker Jenkins plugin
-RUN curl --retry 6 -sSL -f https://github.com/dekobon/docker-plugin/releases/download/sdc-patch/docker-plugin.hpi -o /usr/share/jenkins/ref/plugins/docker-plugin.jpi && \
-    unzip -qt /usr/share/jenkins/ref/plugins/docker-plugin.jpi && \
-    chown -R jenkins:jenkins /usr/share/jenkins/ref/plugins
-
 USER root
-
-COPY opt/containerbuddy /opt/containerbuddy
-
-RUN curl --retry 6 -sSL -f https://github.com/joyent/containerbuddy/releases/download/$CONTAINERBUDDY_VER/containerbuddy-$CONTAINERBUDDY_VER.tar.gz -o /tmp/containerbuddy.tar.gz && \
-    echo "$CONTAINERBUDDY_CHECKSUM  /tmp/containerbuddy.tar.gz" | sha1sum -c && \
-    tar xzf /tmp/containerbuddy.tar.gz -C /opt/containerbuddy && \
-    chmod +x /opt/containerbuddy/containerbuddy && \
-    chown -R jenkins:jenkins /opt/containerbuddy && \
-    rm -f /tmp/containerbuddy.tar.gz
 
 # Add authbind so that we can listen on lower ports
 # Add docker so that we can provision using the Docker API on Triton
@@ -44,7 +18,6 @@ RUN apt-get update && \
         xmlstarlet \
         dc \
         uuid-runtime \
-        strace vim \
         docker-engine && \
     rm -rf /var/lib/apt/lists/* && \
     touch /etc/authbind/byport/22 && \
@@ -57,19 +30,49 @@ RUN apt-get update && \
     chown jenkins /etc/authbind/byport/80 && \
     chown jenkins /etc/authbind/byport/443
 
-COPY usr/local/bin/first-run.sh /usr/local/bin/first-run.sh
-COPY usr/local/bin/triton-jenkins.sh /usr/local/bin/triton-jenkins.sh
-COPY usr/local/bin/proclimit.sh /usr/local/bin/proclimit.sh
-COPY usr/share/jenkins/templates /usr/share/jenkins/templates
+# Add SDC setup script
+RUN curl --retry 6 -sSL -o /usr/local/bin/sdc-docker-setup.sh \
+https://raw.githubusercontent.com/joyent/sdc-docker/master/tools/sdc-docker-setup.sh \
+   && chmod +x /usr/local/bin/sdc-docker-setup.sh
 
-RUN chmod +x /usr/local/bin/triton-jenkins.sh && \
-    chmod +x /usr/local/bin/first-run.sh && \
-    chmod +x /usr/local/bin/proclimit.sh
+# Add Containerbuddy and its configuration
+ENV CONTAINERBUDDY_VER 1.2.1
+ENV CONTAINERBUDDY_CHECKSUM aca04b3c6d6ed66294241211237012a23f8b4f20
+ENV CONTAINERBUDDY file:///etc/containerbuddy.json
+
+RUN export CB_SHA1=aca04b3c6d6ed66294241211237012a23f8b4f20 \
+    && curl -Lso /tmp/containerbuddy.tar.gz \
+         "https://github.com/joyent/containerbuddy/releases/download/${CONTAINERBUDDY_VER}/containerbuddy-${CONTAINERBUDDY_VER}.tar.gz" \
+    && echo "${CONTAINERBUDDY_CHECKSUM}  /tmp/containerbuddy.tar.gz" | sha1sum -c \
+    && tar zxf /tmp/containerbuddy.tar.gz -C /bin \
+    && rm /tmp/containerbuddy.tar.gz
+
+COPY etc/containerbuddy.json etc/containerbuddy.json
+
+
+# ------------------------------------------------
+# install Jenkins plugins and configuration
 
 USER jenkins
+
+# Add Jenkins plugins
+COPY usr/share/jenkins/plugin-deps.txt /usr/share/jenkins/plugin-deps.txt
+RUN /usr/local/bin/plugins.sh /usr/share/jenkins/plugin-deps.txt
+
+# Add patched Docker Jenkins plugin
+RUN curl --retry 6 -sSL -f https://github.com/dekobon/docker-plugin/releases/download/sdc-patch/docker-plugin.hpi -o /usr/share/jenkins/ref/plugins/docker-plugin.jpi && \
+    unzip -qt /usr/share/jenkins/ref/plugins/docker-plugin.jpi && \
+    chown -R jenkins:jenkins /usr/share/jenkins/ref/plugins
+
+# Jenkins config and templates
+COPY usr/local/bin/first-run.sh /usr/local/bin/first-run.sh
+COPY usr/local/bin/jenkins.sh /usr/local/bin/jenkins.sh
+COPY usr/local/bin/proclimit.sh /usr/local/bin/proclimit.sh
+COPY usr/local/bin/reload-jobs.sh /usr/local/bin/reload-jobs.sh
+COPY usr/share/jenkins/templates /usr/share/jenkins/templates
 
 EXPOSE 22
 EXPOSE 80
 
 ENTRYPOINT []
-CMD ["/opt/containerbuddy/containerbuddy", "-config", "file:///opt/containerbuddy/app.json", "/usr/local/bin/triton-jenkins.sh"]
+CMD ["/bin/containerbuddy", "/usr/local/bin/jenkins.sh"]

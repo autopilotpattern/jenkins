@@ -1,15 +1,21 @@
-# Start with a single host which will bootstrap the cluster. Once the
-# cluster is bootstrapped we can set BOOTSTRAP_HOST and scale up
-# more Consul instances.
-# By using automatic bootstrapping via `-bootstrap-expect` and adding
-# the environment variable, we can avoid having to use links. The
-# environment variable is used once at bootstrap and then forever
-# discarded by that node.
+jenkins:
+    image: 0x74696d/triton-jenkins:cb-integration
+    restart: always
+    mem_limit: 8g
+    ports:
+      - 80
+      - 22
+    labels:
+      - triton.cns.services=jenkins
+    env_file: _env
+
+# Start with a single host which will bootstrap the cluster.
+# In production we'll want to use an HA cluster.
 consul:
-    image: misterbisson/triton-consul:latest
+    image: progrium/consul:latest
     restart: always
     mem_limit: 128m
-    ports:
+    expose:
       - 53
       - 8300
       - 8301
@@ -18,29 +24,6 @@ consul:
       - 8500
     dns:
        - 127.0.0.1
-    environment:
-       - BOOTSTRAP_HOST
-    command: >
-      /opt/containerbuddy/containerbuddy
-      -config file:///etc/containerbuddy.json
-      /bin/consul agent -server
-                  -config-dir=/config
-                  -ui-dir /ui
-                  -bootstrap-expect 3
-
-jenkins:
-    image: dekobon/triton-jenkins:cb-integration
-    restart: always
-    mem_limit: 8g
-    links:
-      - consul
-    ports:
-      - 80
-      - 22
     labels:
-      - triton.cns.services=jenkins
-    entrypoint: []
-    command: >
-      /opt/containerbuddy/containerbuddy
-      -config file:///opt/containerbuddy/app.json
-      /usr/local/bin/triton-jenkins.sh
+      - triton.cns.services=consul
+    command: -server -bootstrap -ui-dir /ui
