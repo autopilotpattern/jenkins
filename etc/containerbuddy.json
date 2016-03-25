@@ -1,0 +1,30 @@
+{
+  "consul": "{{ .CONSUL }}:8500",
+  "onStart": "/usr/local/bin/first-run.sh",
+  "stopTimeout": 60,
+  "logging": {
+    "level": "INFO",
+    "format": "default",
+    "output": "stdout"
+  },
+  "services": [
+    {
+      "name": "jenkins",
+      "port": 80,
+      "health": "/usr/local/bin/reload-jobs.sh check",
+      "interfaces": [
+        "eth0",
+        "eth1[1]",
+        "192.168.0.0/16",
+        "2001:db8::/64",
+        "eth2:inet",
+        "eth2:inet6",
+        "inet",
+        "inet6"
+      ],
+      "poll": 30,
+      "ttl": 60,
+      "tags": [ "jenkins" ]
+    }
+  ]
+}
