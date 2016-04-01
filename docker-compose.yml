@@ -1,5 +1,5 @@
 jenkins:
-    image: 0x74696d/triton-jenkins:cb-integration
+    image: autopilotpattern/jenkins
     restart: always
     mem_limit: 8g
     ports:

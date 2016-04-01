@@ -1,8 +1,8 @@
-# Triton Jenkins
+# Jenkins autopilot pattern
 
 [![](https://badge.imagelayers.io/dekobon/triton-jenkins:latest.svg)](https://imagelayers.io/?images=dekobon/triton-jenkins:latest 'Get your own badge on imagelayers.io')
-[![DockerPulls](https://img.shields.io/docker/pulls/dekobon/triton-jenkins.svg)](https://registry.hub.docker.com/u/dekobon/triton-jenkins/)
-[![DockerStars](https://img.shields.io/docker/stars/dekobon/triton-jenkins.svg)](https://registry.hub.docker.com/u/dekobon/triton-jenkins/)
+[![DockerPulls](https://img.shields.io/docker/pulls/autopilotpattern/jenkins.svg)](https://registry.hub.docker.com/u/autopilotpattern/jenkins/)
+[![DockerStars](https://img.shields.io/docker/stars/autopilotpattern/jenkins.svg)](https://registry.hub.docker.com/u/autopilotpattern/jenkins/)
 
 This repo is an extension of the official [Jenkins](https://jenkins.io/) Docker image, designed to be self-operating according to the [autopilot pattern](http://autopilotpattern.io/). This application demonstrates support for building containers via [Joyent's Triton](https://www.joyent.com/) and for provisioning Jenkins slaves via Triton.
 
