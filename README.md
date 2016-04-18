@@ -1,11 +1,11 @@
-# Jenkins autopilot pattern
-
-[![](https://badge.imagelayers.io/dekobon/triton-jenkins:latest.svg)](https://imagelayers.io/?images=dekobon/triton-jenkins:latest 'Get your own badge on imagelayers.io')
-[![DockerPulls](https://img.shields.io/docker/pulls/autopilotpattern/jenkins.svg)](https://registry.hub.docker.com/u/autopilotpattern/jenkins/)
-[![DockerStars](https://img.shields.io/docker/stars/autopilotpattern/jenkins.svg)](https://registry.hub.docker.com/u/autopilotpattern/jenkins/)
+# Autopilot Pattern Jenkins
 
 This repo is an extension of the official [Jenkins](https://jenkins.io/) Docker image, designed to be self-operating according to the [autopilot pattern](http://autopilotpattern.io/). This application demonstrates support for building containers via [Joyent's Triton](https://www.joyent.com/) and for provisioning Jenkins slaves via Triton.
 
+[![](https://badge.imagelayers.io/autopilotpattern/jenkins:latest.svg)](https://imagelayers.io/?images=autopilotpattern/jenkins:latest 'Get your own badge on imagelayers.io')
+[![DockerPulls](https://img.shields.io/docker/pulls/autopilotpattern/jenkins.svg)](https://registry.hub.docker.com/u/autopilotpattern/jenkins/)
+[![DockerStars](https://img.shields.io/docker/stars/autopilotpattern/jenkins.svg)](https://registry.hub.docker.com/u/autopilotpattern/jenkins/)
+[![Join the chat at https://gitter.im/autopilotpattern/mysql](https://badges.gitter.im/autopilotpattern/jenkins.svg)](https://gitter.im/autopilotpattern/jenkins)
 
 ### Design
 
