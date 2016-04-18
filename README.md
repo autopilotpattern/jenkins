@@ -5,7 +5,7 @@ This repo is an extension of the official [Jenkins](https://jenkins.io/) Docker 
 [![](https://badge.imagelayers.io/autopilotpattern/jenkins:latest.svg)](https://imagelayers.io/?images=autopilotpattern/jenkins:latest 'Get your own badge on imagelayers.io')
 [![DockerPulls](https://img.shields.io/docker/pulls/autopilotpattern/jenkins.svg)](https://registry.hub.docker.com/u/autopilotpattern/jenkins/)
 [![DockerStars](https://img.shields.io/docker/stars/autopilotpattern/jenkins.svg)](https://registry.hub.docker.com/u/autopilotpattern/jenkins/)
-[![Join the chat at https://gitter.im/autopilotpattern/mysql](https://badges.gitter.im/autopilotpattern/jenkins.svg)](https://gitter.im/autopilotpattern/jenkins)
+[![Join the chat at https://gitter.im/autopilotpattern/general](https://badges.gitter.im/autopilotpattern/general.svg)](https://gitter.im/autopilotpattern/general)
 
 ### Design
 
