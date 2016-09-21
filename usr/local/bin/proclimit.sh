@@ -1,42 +1,41 @@
-#!/usr/bin/env bash
-
-# Just return the value from nproc if we are not on a Triton container
-if [ ! -d /native ]; then
-    nproc
-    exit 0
-fi
+#!/usr/bin/env sh
 
 ##
-# Returns a number representing a very conservative estimate of the maximum
-# number of processes or threads that you want to run within the zone that
-# invoked this script. Typically, you would take this value and define a
+# When this script is invoked inside of a LX Brand Zone:
+#
+# This script returns a number representing a very conservative estimate of the 
+# maximum number of processes or threads that you want to run within the zone 
+# that invoked this script. Typically, you would take this value and define a
 # multiplier that works well for your application.
+#
+# Otherwise:
+# This script returns the number of cores reported by the OS.
 
-if [[ -d /native ]]; then
-    PATH=$PATH:/native/usr/bin
+# If we are on a LX Brand Zone calculation value using utilities only available in the /native
+# directory
+if [ -d /native ]; then
+   /native/usr/bin/ksh93 -c 'echo $(($(/native/usr/bin/prctl -n zone.cpu-cap $$ | /native/usr/bin/grep privileged | /native/usr/bin/awk "{ print \$2 }") / 100))'
+   exit 0
 fi
 
-set -o errexit
-if [[ -n ${TRACE} ]]; then
-    set -o xtrace
+# Linux calculation if you have nproc
+if [ -n "$(which nproc)" ]; then 
+  nproc
+  exit 0
 fi
 
-# CN parameters
-CORES=$(kstat -C -m cpu_info -c misc -s core_id | wc -l | tr -d ' ')
-PHYS_MEM=$(kstat -C -m unix -n system_pages -c pages -s physmem | cut -d':' -f5)
-PAGESIZE=$(pagesize)
-TOTAL_MEMORY=$(echo "${PHYS_MEM} ${PAGESIZE} * pq" | dc)
+# Linux more widely supported implementation
+if [ -f /proc/cpuinfo ] && [ -n $(which wc) ]; then
+  grep processor /proc/cpuinfo | wc -l
+  exit 0
+fi
 
-# zone parameters
-ZONE_MEMORY=$(kstat -C -m memory_cap -c zone_memory_cap -s physcap | cut -d':' -f5)
+# OS X calculation
+if [ "$(uname)" == "Darwin" ]; then
+  sysctl -n hw.ncpu
+  exit 0
+fi
 
-# our fraction of the total memory on the CN
-MEMORY_SHARE=$(echo "8k$ZONE_MEMORY $TOTAL_MEMORY / pq" | dc)
+# Fallback value if we can't calculate
+echo 1
 
-# best guess as to how many CPUs we should pretend like we have for tuning
-CPU_GUESS=$(echo "${CORES} ${MEMORY_SHARE} * pq" | dc)
-
-# round that up to a positive integer
-echo ${CPU_GUESS} | awk 'function ceil(valor) { return (valor == int(valor) && value != 0) ? valor : int(valor)+1 } { printf "%d", ceil($1) }'
-
-exit 0
