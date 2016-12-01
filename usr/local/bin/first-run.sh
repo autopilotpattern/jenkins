@@ -43,7 +43,7 @@ create_jenkins_user() {
 docker_setup() {
     echo
     echo 'Setting up Triton credentials for launching Docker containers...'
-    if [ -z ${PRIVATE_KEY} ]; then
+    if [ -z "${PRIVATE_KEY}" ]; then
         echo 'PRIVATE_KEY not set. Exiting.'
         exit 1
     fi
@@ -62,7 +62,7 @@ docker_setup() {
 docker_plugin_setup() {
     echo
     echo "Adding Triton Docker credentials to Jenkins..."
-    if [ -z ${TRITON_ACCOUNT} ]; then
+    if [ -z "${TRITON_ACCOUNT}" ]; then
         echo 'TRITON_ACCOUNT not set. Exiting.'
         exit 1
     fi
