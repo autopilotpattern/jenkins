@@ -5,15 +5,15 @@ This repo is an extension of the official [Jenkins](https://jenkins.io/) Docker 
 [![](https://badge.imagelayers.io/autopilotpattern/jenkins:latest.svg)](https://imagelayers.io/?images=autopilotpattern/jenkins:latest 'Get your own badge on imagelayers.io')
 [![DockerPulls](https://img.shields.io/docker/pulls/autopilotpattern/jenkins.svg)](https://registry.hub.docker.com/u/autopilotpattern/jenkins/)
 [![DockerStars](https://img.shields.io/docker/stars/autopilotpattern/jenkins.svg)](https://registry.hub.docker.com/u/autopilotpattern/jenkins/)
-[![Join the chat at https://gitter.im/autopilotpattern/general](https://badges.gitter.im/autopilotpattern/general.svg)](https://gitter.im/autopilotpattern/general)
+
 
 ### Design
 
-One of the most important aspects of CI is ensuring that the CI system itself is secured, but including credentials to the build system in the container image leaves us open to accidental disclosure. This architecture injects credentials via environment variables and then uses a Containerbuddy `onStart` handler to update the appropriate files required by Jenkins.
+One of the most important aspects of CI is ensuring that the CI system itself is secured, but including credentials to the build system in the container image leaves us open to accidental disclosure. This architecture injects credentials via environment variables and then uses a ContainerPilot `preStart` handler to update the appropriate files required by Jenkins.
 
-Another design constraint is that CI systems often become "pets not cattle," which results in disruption to deployments if the Jenkins server is broken. We can take advantage of the autopilot pattern to have a Jenkins instance bootstrap its job configuration from GitHub during the `onStart` handler.
+Another design constraint is that CI systems often become "pets not cattle," which results in disruption to deployments if the Jenkins server is broken. We can take advantage of ContainerPilot to have a Jenkins instance bootstrap its job configuration from GitHub during the `preStart` handler.
 
-The `first-run.sh` script called by the `onStart` handler will create a new job called "jenkins-jobs." When triggered, this job pulls a workspace from a git repository passed in the `GITHUB_JOBS_REPO` environment variable and from that repo creates new jobs from each configuration it can find in the workspace's `jobs/` directory. Existing jobs will be updated from the remote repo.
+The `first-run.sh` script called by the `preStart` handler will create a new job called "jenkins-jobs". When triggered, this job pulls a workspace from a git repository passed in the `GITHUB_JOBS_REPO` environment variable and from that repo creates new jobs from each configuration it can find in the workspace's `jobs/` directory. Existing jobs will be updated from the remote repo.
 
 
 ### Caveats

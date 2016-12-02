@@ -1,4 +1,4 @@
-FROM jenkins:1.642.2
+FROM jenkins:2.19.3
 
 USER root
 
@@ -35,20 +35,18 @@ RUN curl --retry 6 -sSL -o /usr/local/bin/sdc-docker-setup.sh \
 https://raw.githubusercontent.com/joyent/sdc-docker/master/tools/sdc-docker-setup.sh \
    && chmod +x /usr/local/bin/sdc-docker-setup.sh
 
-# Add Containerbuddy and its configuration
-ENV CONTAINERBUDDY_VER 1.2.1
-ENV CONTAINERBUDDY_CHECKSUM aca04b3c6d6ed66294241211237012a23f8b4f20
-ENV CONTAINERBUDDY file:///etc/containerbuddy.json
+# Add ContainerPilot and its configuration
+ENV CONTAINERPILOT file:///etc/containerpilot.json
 
-RUN export CB_SHA1=aca04b3c6d6ed66294241211237012a23f8b4f20 \
-    && curl -Lso /tmp/containerbuddy.tar.gz \
-         "https://github.com/joyent/containerbuddy/releases/download/${CONTAINERBUDDY_VER}/containerbuddy-${CONTAINERBUDDY_VER}.tar.gz" \
-    && echo "${CONTAINERBUDDY_CHECKSUM}  /tmp/containerbuddy.tar.gz" | sha1sum -c \
-    && tar zxf /tmp/containerbuddy.tar.gz -C /bin \
-    && rm /tmp/containerbuddy.tar.gz
+RUN export checksum=b56a9aff365fd9526cd0948325f91a367a3f84a1 \
+    && export archive=containerpilot-2.5.1.tar.gz \
+    && curl -Lso /tmp/${archive} \
+    https://github.com/joyent/containerpilot/releases/download/2.5.1/${archive} \
+    && echo "${checksum}  /tmp/${archive}" | sha1sum -c \
+    && tar zxf /tmp/${archive} -C /usr/local/bin \
+    && rm /tmp/${archive}
 
-COPY etc/containerbuddy.json etc/containerbuddy.json
-
+COPY etc/containerpilot.json /etc/containerpilot.json
 
 # ------------------------------------------------
 # install Jenkins plugins and configuration
@@ -56,13 +54,7 @@ COPY etc/containerbuddy.json etc/containerbuddy.json
 USER jenkins
 
 # Add Jenkins plugins
-COPY usr/share/jenkins/plugin-deps.txt /usr/share/jenkins/plugin-deps.txt
-RUN /usr/local/bin/plugins.sh /usr/share/jenkins/plugin-deps.txt
-
-# Add patched Docker Jenkins plugin
-RUN curl --retry 6 -sSL -f https://github.com/dekobon/docker-plugin/releases/download/sdc-patch/docker-plugin.hpi -o /usr/share/jenkins/ref/plugins/docker-plugin.jpi && \
-    unzip -qt /usr/share/jenkins/ref/plugins/docker-plugin.jpi && \
-    chown -R jenkins:jenkins /usr/share/jenkins/ref/plugins
+RUN /usr/local/bin/install-plugins.sh git token-macro docker-plugin
 
 # Jenkins config and templates
 COPY usr/local/bin/first-run.sh /usr/local/bin/first-run.sh
@@ -75,4 +67,4 @@ EXPOSE 22
 EXPOSE 80
 
 ENTRYPOINT []
-CMD ["/bin/containerbuddy", "/usr/local/bin/jenkins.sh"]
+CMD ["/usr/local/bin/containerpilot", "/usr/local/bin/jenkins.sh"]
