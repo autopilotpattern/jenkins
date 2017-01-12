@@ -3,11 +3,29 @@ jenkins:
     restart: always
     mem_limit: 8g
     ports:
-      - 80
+      - 8000
       - 22
     labels:
       - triton.cns.services=jenkins
     env_file: _env
+
+# reverse proxy for protecting Jenkins w/ TLS
+nginx:
+    image: autopilotpattern/jenkins-nginx
+    restart: always
+    mem_limit: 256m
+    environment:
+      - BACKEND=jenkins
+      - CONSUL_AGENT=1
+      - ACME_ENV=
+      - ACME_DOMAIN=
+    env_file: _env
+    labels:
+      - triton.cns.services=jenkins-nginx
+    ports:
+      - 80
+      - 443
+      - 9090
 
 # Start with a single host which will bootstrap the cluster.
 # In production we'll want to use an HA cluster.
@@ -25,5 +43,5 @@ consul:
     dns:
        - 127.0.0.1
     labels:
-      - triton.cns.services=consul
+      - triton.cns.services=jenkins-consul
     command: -server -bootstrap -ui-dir /ui

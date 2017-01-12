@@ -54,7 +54,7 @@ COPY etc/containerpilot.json /etc/containerpilot.json
 USER jenkins
 
 # Add Jenkins plugins
-RUN /usr/local/bin/install-plugins.sh git token-macro docker-plugin
+RUN /usr/local/bin/install-plugins.sh git github token-macro docker-plugin
 
 # Jenkins config and templates
 COPY usr/local/bin/first-run.sh /usr/local/bin/first-run.sh
@@ -64,7 +64,7 @@ COPY usr/local/bin/reload-jobs.sh /usr/local/bin/reload-jobs.sh
 COPY usr/share/jenkins/templates /usr/share/jenkins/templates
 
 EXPOSE 22
-EXPOSE 80
+EXPOSE 8000
 
 ENTRYPOINT []
 CMD ["/usr/local/bin/containerpilot", "/usr/local/bin/jenkins.sh"]
