@@ -10,7 +10,7 @@
   "services": [
     {
       "name": "jenkins",
-      "port": 80,
+      "port": 8000,
       "health": "/usr/local/bin/reload-jobs.sh check",
       "interfaces": [
         "eth0",

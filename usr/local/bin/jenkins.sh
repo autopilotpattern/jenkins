@@ -31,4 +31,4 @@ JAVA_OPTS="${JAVA_GC_FLAGS} ${MEMORY_SETTINGS} -Djava.net.preferIPv4Stack=true -
 
 authbind --deep java $JAVA_OPTS \
          -jar /usr/share/jenkins/jenkins.war \
-         --httpPort=80 $JENKINS_OPTS
+         --httpPort=8000 $JENKINS_OPTS
