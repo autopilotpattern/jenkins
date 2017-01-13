@@ -7,7 +7,7 @@ TAG?=latest
 
 # run the Docker build
 build:
-	docker -f local-compose.yml build
+	docker-compose -f local-compose.yml build
 
 # push our image to the public registry
 ship:
