@@ -75,7 +75,7 @@ setup_jenkins_user() {
     echo 'writing Jenkins admin user config'
     cat /usr/share/jenkins/templates/users/admin/config.xml | \
         sed "s|JENKINS_API_TOKEN|${JENKINS_API_TOKEN}|" | \
-        sed "s|JENKINS_PASSWORD_HASH|${HASH}|" \
+        sed "s|JENKINS_PASSWORD_HASH|{zil0}${HASH}|" \
             > ${JENKINS_HOME}/users/admin/config.xml
 
     # make Jenkins password available to our reload-jobs.sh job
