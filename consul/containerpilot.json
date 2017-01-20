@@ -1,0 +1,4 @@
+{
+  "consul": "consul:8500",
+  "preStart": ["/usr/local/bin/consul-manage", "preStart"]
+}

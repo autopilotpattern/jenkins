@@ -3,7 +3,7 @@
     <fullName>Administrator</fullName>
     <properties>
         <jenkins.security.ApiTokenProperty>
-            <apiToken>3nFZ21tdFK/1ta2O5SEdSF0PgijXlcyZUE1s0NFfcJeG76j+Pg0Eua9z+9xXT4GK</apiToken>
+            <apiToken>JENKINS_API_TOKEN</apiToken>
         </jenkins.security.ApiTokenProperty>
         <com.cloudbees.plugins.credentials.UserCredentialsProvider_-UserCredentialsProperty plugin="credentials@1.24">
             <domainCredentialsMap class="hudson.util.CopyOnWriteMap$Hash"/>
@@ -26,7 +26,7 @@
             <insensitiveSearch>false</insensitiveSearch>
         </hudson.search.UserSearchProperty>
         <hudson.security.HudsonPrivateSecurityRealm_-Details>
-            <passwordHash>bar:7f128793bc057556756f4195fb72cdc5bd8c5a74dee655a6bfb59b4a4c4f4349</passwordHash>
+            <passwordHash>JENKINS_PASSWORD_HASH</passwordHash>
         </hudson.security.HudsonPrivateSecurityRealm_-Details>
     </properties>
 </user>
