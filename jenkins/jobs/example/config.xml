@@ -8,12 +8,12 @@
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
-        <url>https://github.com/tgross/triton-nginx</url>
+        <url>https://github.com/autopilotpattern/nginx</url>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
     <branches>
       <hudson.plugins.git.BranchSpec>
-        <name>*/master</name>
+        <name>master</name>
       </hudson.plugins.git.BranchSpec>
     </branches>
     <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
@@ -32,7 +32,12 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>docker build -t=&quot;example:$BUILD_NUMBER&quot; .</command>
+      <command>unset DOCKER_HOST=;
+unset DOCKER_TLS_VERIFY;
+unset DOCKER_CERT_PATH;
+export COMPOSE_PROJECT_NAME=nginx;
+touch _env;
+docker-compose -f local-compose.yml build</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
