@@ -140,7 +140,7 @@ _jenkins_env() {
     {
         echo
         echo '# GitHub config'
-        echo 'GITHUB_JOBS_REPO=git@github.com:joyent/product-automation.git'
+        echo 'GITHUB_JOBS_REPO=git@github.com:autopilotpattern/jenkins.git'
         echo 'GITHUB_JOBS_SPEC='
         echo "GITHUB_API_TOKEN=${githubApiToken}"
         echo "GITHUB_HOOK_TOKEN=${githubHookToken}"

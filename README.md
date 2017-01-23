@@ -82,7 +82,6 @@ To run the deployment, you'll need the following:
 - Ansible deployed on your workstation
 - Triton ssh private key stored at `./builder/keys_private/triton`
 - GitHub ssh deployment private keys for private GitHub repos stored at `./builder/keys_private/*`
-- (Optional) team member ssh public keys stored at `./builder/keys_public/*.pub`
 - GitHub API token for your GitHub account, ready to be entered into `./manage.sh setup`
 - GitHub web hook token for your GitHub project, ready to be entered into `./manage.sh setup`
 - GitHub OAuth application Client Id and Secret, ready to be entered into `./manage.sh setup`

@@ -8,7 +8,7 @@
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
-        <url>git@github.com:joyent/product-automation.git</url>
+        <url>git@github.com:autopilotpattern/jenkins.git</url>
         <credentialsId>208acc1b-bded-4a54-94b5-b929cc0ff89e</credentialsId>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
