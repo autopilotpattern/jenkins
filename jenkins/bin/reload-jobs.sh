@@ -22,11 +22,9 @@ reload() {
         local jobname=$(basename ${job})
         local config=${WORKSPACE}/jenkins/jobs/${jobname}/config.xml
 
-        # TODO: we probably want a dedicated user for this rather than 'tgross'
-        # create a new job for each directory under workspace/jobs
         curl -XPOST -s -o /dev/null \
              -d @"${config}" \
-             --user "tgross:${GITHUB_API_TOKEN}" \
+             --user "${GITHUB_USER}:${GITHUB_API_TOKEN}" \
              -H 'Content-Type: application/xml' \
              "http://localhost:8000/createItem?name=${jobname}"
 
@@ -35,7 +33,7 @@ reload() {
         # job anyways
         curl -XPOST -s --fail -o /dev/null \
              -d @"${config}" \
-             --user "tgross:${GITHUB_API_TOKEN}" \
+             --user "${GITHUB_USER}:${GITHUB_API_TOKEN}" \
              -H 'Content-Type: application/xml' \
              "http://localhost:8000/job/${jobname}/config.xml"
     done
@@ -46,7 +44,7 @@ check() {
     # we've pulled jobs down from GitHub
     if [ ! -f "${JENKINS_HOME}/jobs/jenkins-jobs/nextBuildNumber" ]; then
         curl -XPOST -s --fail -o /dev/null \
-             --user "tgross:${GITHUB_API_TOKEN}" \
+             --user "${GITHUB_USER}:${GITHUB_API_TOKEN}" \
              http://localhost:8000/job/jenkins-jobs/build
     fi
 

@@ -127,6 +127,8 @@ _jenkins_env() {
 
     echo
     bold '* Configuring GitHub environment'
+    echo -n "Provide GitHub API user [or hit Enter to skip for now]: "
+    read -r githubUser
     echo -n "Provide GitHub API token [or hit Enter to skip for now]: "
     read -r githubApiToken
     echo -n "Provide GitHub hook token [or hit Enter to autogenerate]: "
@@ -142,6 +144,7 @@ _jenkins_env() {
         echo '# GitHub config'
         echo 'GITHUB_JOBS_REPO=git@github.com:autopilotpattern/jenkins.git'
         echo 'GITHUB_JOBS_SPEC='
+        echo "GITHUB_USER=${githubUser}"
         echo "GITHUB_API_TOKEN=${githubApiToken}"
         echo "GITHUB_HOOK_TOKEN=${githubHookToken}"
         echo "GITHUB_OAUTH_CLIENT_ID=${githubOAuthClientId}"
