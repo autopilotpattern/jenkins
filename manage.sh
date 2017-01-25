@@ -137,6 +137,8 @@ _jenkins_env() {
     read -r githubOAuthClientId
     echo -n "Provide GitHub API token [or hit Enter to skip for now]: "
     read -r githubOAuthSecret
+    echo -n "Provide path to jobs directory in GitHub repo [or hit Enter to default to jenkins/jobs]: "
+    read -r jenkinsJobsPath
 
     githubHookToken=${githubHookToken:-$(gentoken 20)}
     {
@@ -149,6 +151,7 @@ _jenkins_env() {
         echo "GITHUB_HOOK_TOKEN=${githubHookToken}"
         echo "GITHUB_OAUTH_CLIENT_ID=${githubOAuthClientId}"
         echo "GITHUB_OAUTH_SECRET=${githubOAuthSecret}"
+        echo "JENKINS_JOBS_PATH=${jenkinsJobsPath:-jenkins/jobs}"
     } >> builder/_jenkins
 
     echo

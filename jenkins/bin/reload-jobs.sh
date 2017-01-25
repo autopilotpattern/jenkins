@@ -17,10 +17,11 @@ reload() {
         /usr/share/jenkins/templates/jenkins-jobs.config.xml \
         > "${JENKINS_HOME}/jobs/jenkins-jobs/config.xml"
 
-    for job in ${WORKSPACE}/jenkins/jobs/*; do
+    local jobsPath="${WORKSPACE}/${JENKINS_JOBS_PATH:-jenkins/jobs}"
+    for job in ${jobsPath}/*; do
 
         local jobname=$(basename ${job})
-        local config=${WORKSPACE}/jenkins/jobs/${jobname}/config.xml
+        local config="${job}/config.xml"
 
         curl -XPOST -s -o /dev/null \
              -d @"${config}" \
