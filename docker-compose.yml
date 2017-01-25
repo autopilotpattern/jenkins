@@ -1,47 +1,48 @@
 jenkins:
-    image: autopilotpattern/jenkins
+    build: ./jenkins
     restart: always
-    mem_limit: 8g
-    ports:
-      - 8000
-      - 22
-    labels:
-      - triton.cns.services=jenkins
-    env_file: _env
+    mem_limit: 4g
+    volumes:
+      # ssh keys for GitHub and Triton
+      # access to the Docker sock to build containers locally
+      - /opt/jenkins/.ssh:/var/jenkins_home/.ssh
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - CONSUL=localhost
+      - DOCKER_TLS_VERIFY=1
+    env_file:
+      - /opt/jenkins/_jenkins
+    net: "host"
 
 # reverse proxy for protecting Jenkins w/ TLS
 nginx:
-    image: autopilotpattern/jenkins-nginx
+    build: ./nginx
     restart: always
-    mem_limit: 256m
+    mem_limit: 128m
     environment:
-      - BACKEND=jenkins
-      - CONSUL_AGENT=1
-      - ACME_ENV=
-      - ACME_DOMAIN=
-    env_file: _env
-    labels:
-      - triton.cns.services=jenkins-nginx
+      - CONSUL=localhost
+    env_file:
+      - /opt/jenkins/_nginx
     ports:
-      - 80
-      - 443
-      - 9090
+      - 80:80
+      - 443:443
+    net: "host"
 
-# Start with a single host which will bootstrap the cluster.
-# In production we'll want to use an HA cluster.
+# local Consul, used for coordinating Nginx only
 consul:
-    image: progrium/consul:latest
+    build: ./consul
     restart: always
     mem_limit: 128m
     expose:
-      - 53
       - 8300
       - 8301
       - 8302
       - 8400
       - 8500
-    dns:
-       - 127.0.0.1
-    labels:
-      - triton.cns.services=jenkins-consul
-    command: -server -bootstrap -ui-dir /ui
+    net: "host"
+    command: >
+      /usr/local/bin/containerpilot
+      /bin/consul agent
+        -server
+        -bootstrap
+        -config-dir=/etc/consul

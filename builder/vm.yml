@@ -1,0 +1,96 @@
+---
+# This playbook deploys everything we need for the CI/CD VM environment.
+# Assumes an Ubuntu VM with Python pre-installed (b/c Ansible requires Python)
+
+- hosts: builder
+  remote_user: ubuntu
+  become: true
+  become_method: sudo
+
+  tasks:
+
+    - name: Update apt key
+      apt_key: keyserver='hkp://p80.pool.sks-keyservers.net:80'
+               id='58118E89F3A912897C070ADBF76221572C52609D'
+
+    - name: Add docker.io repo
+      apt_repository: repo='deb https://apt.dockerproject.org/repo ubuntu-xenial main'
+                      state=present
+
+    - name: Update apt cache
+      apt: update_cache=yes
+
+    - name: Install docker
+      apt: name=docker-engine state=installed
+
+    - name: Add Docker service overlay file
+      copy:
+        src: docker.service
+        dest: /etc/systemd/system/docker.service
+
+    - name: Restart Docker
+      systemd:
+        name: docker
+        state: restarted
+        daemon_reload: yes
+
+      # no need for us to constantly sudo w/ docker
+    - name: Give ubuntu user access to docker
+      user: name=ubuntu groups=docker append=yes
+
+    - name: Install pip
+      apt: name=python-pip state=installed
+
+    - name: Install Compose
+      pip: name="docker-compose"
+
+    - name: Give ubuntu user access to our application dirs
+      file: path=/opt
+            group=ubuntu
+            owner=ubuntu
+
+    - name: Create user-friendly commands for Jenkins
+      copy: src=jenkins
+            dest=/bin/jenkins
+            mode=755
+
+    - name: Add application
+      git: repo=git@github.com:autopilotpattern/jenkins.git
+           dest=/opt/jenkins
+           version=master
+           update=yes
+           accept_hostkey=true
+      become: false
+
+    - name: Add env vars for containers
+      copy: src="{{ item }}"
+            dest="/opt/jenkins/{{ item }}"
+      become: false
+      with_items:
+        - _jenkins
+        - _nginx
+
+    - name: Add deployment keys for Jenkins
+      copy: src="{{ item }}"
+            dest="/opt/jenkins/.ssh/"
+            owner=ubuntu
+            mode=400
+      become: false
+      with_fileglob:
+        - keys_private/*
+
+    - name: Build initial docker containers
+      command: docker-compose build
+      args:
+        chdir: /opt/jenkins
+
+    - name: Add Jenkins service file
+      copy: src=jenkins.service
+            dest=/etc/systemd/system/jenkins.service
+
+    - name: Start Jenkins
+      systemd:
+        name: jenkins
+        state: started
+        enabled: True
+        daemon_reload: yes

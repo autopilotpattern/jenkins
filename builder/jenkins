@@ -1,0 +1,42 @@
+#!/bin/bash
+# helper script for running and stopping Jenkins
+
+_help() {
+cat << EOF
+Usage: sudo jenkins <subcommand>
+
+	sudo jenkins start: starts Jenkins via systemd and docker-compose
+	sudo jenkins stop: stops Jenkins but does not remove containers
+	sudo jenkins kill: stop Jenkins and removes containers
+
+EOF
+}
+
+_stop() {
+    systemctl stop jenkins
+ }
+
+_kill() {
+    systemctl stop jenkins
+    docker rm $(docker ps -a | awk '/jenkins/{print $1}')
+}
+
+_clean() {
+    docker rm $(docker ps -aq)
+    docker rmi $(docker images | awk -F' +' '/<none>/{print $3}')
+    docker volume rm $(docker volume ls -qf dangling=true)
+}
+
+_start() {
+    systemctl start jenkins
+}
+
+while true; do
+    case $1 in
+        start) _start; exit; break;;
+        stop) _stop; exit; break;;
+        kill) _kill; exit; break;;
+        clean) _clean; exit; break;;
+        *) _help; exit; break;;
+    esac
+done

@@ -18,7 +18,9 @@ RUN apt-get update && \
         xmlstarlet \
         dc \
         uuid-runtime \
+        python-pip \
         docker-engine && \
+    pip install docker-compose && \
     rm -rf /var/lib/apt/lists/* && \
     touch /etc/authbind/byport/22 && \
     touch /etc/authbind/byport/80 && \
@@ -29,6 +31,8 @@ RUN apt-get update && \
     chown jenkins /etc/authbind/byport/22 && \
     chown jenkins /etc/authbind/byport/80 && \
     chown jenkins /etc/authbind/byport/443
+
+RUN usermod -a -G docker jenkins
 
 # Add SDC setup script
 RUN curl --retry 6 -sSL -o /usr/local/bin/sdc-docker-setup.sh \
@@ -54,14 +58,14 @@ COPY etc/containerpilot.json /etc/containerpilot.json
 USER jenkins
 
 # Add Jenkins plugins
-RUN /usr/local/bin/install-plugins.sh git github token-macro docker-plugin
+RUN /usr/local/bin/install-plugins.sh git github token-macro docker-plugin github-oauth
 
 # Jenkins config and templates
-COPY usr/local/bin/first-run.sh /usr/local/bin/first-run.sh
-COPY usr/local/bin/jenkins.sh /usr/local/bin/jenkins.sh
-COPY usr/local/bin/proclimit.sh /usr/local/bin/proclimit.sh
-COPY usr/local/bin/reload-jobs.sh /usr/local/bin/reload-jobs.sh
-COPY usr/share/jenkins/templates /usr/share/jenkins/templates
+COPY bin/first-run.sh /usr/local/bin/first-run.sh
+COPY bin/jenkins.sh /usr/local/bin/jenkins.sh
+COPY bin/proclimit.sh /usr/local/bin/proclimit.sh
+COPY bin/reload-jobs.sh /usr/local/bin/reload-jobs.sh
+COPY templates /usr/share/jenkins/templates
 
 EXPOSE 22
 EXPOSE 8000

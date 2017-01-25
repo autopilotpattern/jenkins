@@ -100,3 +100,9 @@ tramp
 
 # Jenkins docker-compose environment
 _env
+builder/inventory
+builder/vm.retry
+builder/_jenkins
+builder/_nginx
+builder/keys_private/*
+!builder/keys_private/.placeholder

@@ -1,0 +1,6 @@
+#!/bin/bash
+set -eo pipefail
+
+# Update the -advertise address for the local IP address
+IP=$(ip addr | awk '/192/{ print $2 }' | sed 's/\/22//')
+sed -i "s/CONTAINERPILOT_CONSUL_IP/${IP}/" /etc/consul/consul.json

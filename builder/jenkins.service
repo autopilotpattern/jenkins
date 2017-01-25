@@ -1,0 +1,13 @@
+[Unit]
+Description=Jenkins container
+Requires=docker.service
+After=docker.service
+
+[Service]
+WorkingDirectory=/opt/jenkins
+ExecStart=/usr/local/bin/docker-compose up consul jenkins nginx
+ExecStop=/usr/local/bin/docker-compose stop nginx jenkins consul
+Restart=always
+
+[Install]
+WantedBy=default.target

@@ -33,17 +33,8 @@ http {
 
     #gzip  on;
 
-    {{ $backend := env "BACKEND" }}
     {{ $acme_domain := env "ACME_DOMAIN" }}
     {{ $ssl_ready := env "SSL_READY" }}
-
-    {{ if service $backend }}
-    upstream jenkins {
-        {{ range service $backend }}
-        server {{.Address}}:{{.Port}};
-        {{end}}
-        least_conn;
-    }{{ end }}
 
     server {
         listen      80;
@@ -107,10 +98,7 @@ http {
             # container to this container
 
             sendfile        off;
-
-            {{ if service $backend }}
-            proxy_pass      http://jenkins;
-            {{ end }}
+            proxy_pass      http://127.0.0.1:8000;
             proxy_redirect  default;
 
             proxy_set_header    Host                $host;
