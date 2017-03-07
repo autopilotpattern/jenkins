@@ -22,7 +22,7 @@ KSH="$(which ksh93)"
 PRCTL="$(which prctl)"
 
 if [ -n "${KSH}" ] && [ -n "${PRCTL}" ]; then
-  CAP=$(${KSH} -c "echo \$((\$(${PRCTL} -n zone.cpu-cap \$\$ | grep privileged | awk '{ print \$2 }') / 100))")
+  CAP=$(${KSH} -c "echo \$((\$(${PRCTL} -n zone.cpu-cap -P \$\$ | grep privileged | awk '{ print \$3; }') / 100))")
 
   # If there is no cap set, then we will fall through and use the other functions
   # to determine the maximum processes.
