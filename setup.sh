@@ -99,6 +99,7 @@ check() {
 
     # setup environment file
     echo 'JENKINS_PASSWD=' > _env
+    echo 'JENKINS_API_TOKEN=' > _env
     echo 'GITHUB_API_KEY=' >> _env
     echo 'GITHUB_JOBS_REPO=' >> _env
     echo 'GITHUB_JOBS_SPEC=' >> _env
